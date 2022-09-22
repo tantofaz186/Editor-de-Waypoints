@@ -57,6 +57,8 @@ public class NodeManager : Singleton<NodeManager>
         if(Input.GetMouseButtonDown(0))
         {
 
+            
+            if(final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
             if(Physics.Raycast(ray, out RaycastHit hitData, 15))
             {
@@ -88,12 +90,11 @@ public class NodeManager : Singleton<NodeManager>
         }
         else if (Input.GetMouseButtonDown(1))
         {
-
+            SetAtual(null);
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
             if (Physics.Raycast(ray, out RaycastHit hitData, 15) && hitData.collider.gameObject.GetComponent<Node>() != null)
                 SetFinal(hitData.collider.gameObject.GetComponent<Node>());
-            else
-                SetAtual(null);
+
         }
         inicial.GetComponent<MeshRenderer>().material.color = Color.cyan;
     }

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 
 public enum NodeState
 {
@@ -12,7 +11,7 @@ public enum NodeState
 }
 public class Node : MonoBehaviour
 {
-    List<Node> neighbors;
+    [SerializeField]List<Node> neighbors;
     public List<Node> Neighbors => neighbors;
     public NodeState State = NodeState.Open;
     private static Material LNMaterial;
@@ -22,10 +21,6 @@ public class Node : MonoBehaviour
     {
         if (LNMaterial != null) return;
         LNMaterial = new Material(Shader.Find("Sprites/Default"));
-    }
-
-    private void Start()
-    {
         neighbors = new List<Node>();
     }
 
@@ -33,8 +28,8 @@ public class Node : MonoBehaviour
     {
         if (neighbors.Contains(neighbor)) return;
         neighbors.Add(neighbor);
-        neighbor.AddNeighbor(this);
         AddVisualConnection(neighbor);
+        neighbor.AddNeighbor(this);
     }
 
     private void AddVisualConnection(Node neighbor)
@@ -52,7 +47,7 @@ public class Node : MonoBehaviour
         else
         {
             lineRenderer = GetComponent<LineRenderer>();
-            lineRenderer.positionCount += 2;
+            lineRenderer.positionCount = neighbors.Count * 2;
             lineRenderer.SetPosition(lineRenderer.positionCount-2, transform.position);
             lineRenderer.SetPosition(lineRenderer.positionCount-1, neighbourPos);
         }
@@ -63,24 +58,21 @@ public class Node : MonoBehaviour
         transform.position = position;
         if (TryGetComponent(out LineRenderer lineRenderer))
         {
-            for (int i = 0; i < lineRenderer.positionCount; i+=2)
+            for (int i = 0; i < lineRenderer.positionCount; i += 2)
             {
                 lineRenderer.SetPosition(i, transform.position);
-
             }
-        }
 
-        foreach (var neighbor in neighbors)
-        {
-            if (TryGetComponent(out LineRenderer ln))
+            foreach (var neighbor in Neighbors)
             {
-                for (int i = 1; i < ln.positionCount; i+=2)
+                int index = neighbor.neighbors.FindIndex(node => node == this);
+                Debug.Log("index: " + index);
+                if (index >= 0)
                 {
-                    ln.SetPosition(i, transform.position);
-
+                    try{neighbor.GetComponent<LineRenderer>().SetPosition(index*2 + 1, transform.position);}
+                    catch{}
                 }
             }
         }
-
     }
 }
