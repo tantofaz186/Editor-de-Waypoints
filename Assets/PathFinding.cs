@@ -6,21 +6,32 @@ using UnityEngine;
 public class PathFinding : Singleton<PathFinding>
 {
     private List<Node> path = new List<Node>();
+    private List<Node> openList;
+    private List<Node> closedList;
     private Vector3 startPos;
     private Vector3 finalPos;
     public List<Node> FindPath()
     {
         startPos = NodeManager.Instance.Inicial.transform.position;
         finalPos = NodeManager.Instance.Final.transform.position;
-        if (Search(NodeManager.Instance.Inicial))
+        path = new List<Node>();
+        openList = NodeManager.Instance.Nodes.FindAll(node => node.State == NodeState.Open);
+        closedList = NodeManager.Instance.Nodes.FindAll(node => node.State == NodeState.Closed);
+        while (openList.Count > 0)
         {
-            var node = NodeManager.Instance.Final;
-            while (node != null)
+            if (Search(NodeManager.Instance.Inicial))
             {
-                path.Add(node);
-                node = node.Parent;
+                var node = NodeManager.Instance.Final;
+                while (node != null)
+                {
+                    path.Add(node);
+                    node = node.Parent;
+                }
             }
+            openList = NodeManager.Instance.Nodes.FindAll(node => node.State == NodeState.Open);
+            closedList = NodeManager.Instance.Nodes.FindAll(node => node.State == NodeState.Closed);    
         }
+        
         path.Reverse();
         DrawPath(path);
         return path;
@@ -43,8 +54,8 @@ public class PathFinding : Singleton<PathFinding>
         {
             return false;
         }*/
-        nextNodes.Sort((node1, node2) => CalculateDistanceCost(node1)
-            .CompareTo(CalculateDistanceCost(node2)));
+        nextNodes.Sort((node1, node2) => CalculateDistanceCost(currentNode, node1)
+            .CompareTo(CalculateDistanceCost(currentNode, node2)));
         foreach (var nextNode in nextNodes)
         {
             if (nextNode == NodeManager.Instance.Final)
@@ -65,10 +76,11 @@ public class PathFinding : Singleton<PathFinding>
     {
         return node.Neighbors.FindAll(neighbour => neighbour.State == NodeState.Open);
     }
-    private float CalculateDistanceCost(Node node)
+    private float CalculateDistanceCost(Node current, Node next)
     {
-        Vector3 nodePosition = node.transform.position;
-        return Vector3.Distance(startPos, nodePosition) + Vector3.Distance(nodePosition, finalPos);
+        Vector3 currentPosition = current.transform.position;
+        Vector3 nodePosition = next.transform.position;
+        return Vector3.Distance(currentPosition, nodePosition) + Vector3.Distance(nodePosition, finalPos);
     }
     
 }

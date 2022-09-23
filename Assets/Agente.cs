@@ -14,8 +14,6 @@ public class Agente : MonoBehaviour
 {
     List<Node> path = new List<Node>();
     AgentState state = AgentState.Start;
-
-
     private void FixedUpdate()
     {
         switch (state)
@@ -37,7 +35,6 @@ public class Agente : MonoBehaviour
         NodeManager.Instance.ResetPath();
         state = AgentState.Start;
     }
-
     private void WaitForPath()
     {
         transform.position = NodeManager.Instance.Inicial.transform.position;

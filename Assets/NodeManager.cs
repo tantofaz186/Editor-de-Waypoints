@@ -17,7 +17,6 @@ public class NodeManager : Singleton<NodeManager>
     private Camera mainCamera;
     [SerializeField] private Agente agente;
     Vector3 mousePos => new Vector3(Input.mousePosition.x, Input.mousePosition.y, 11 );
-
     private void Start()
     {
         Nodes = new List<Node>();
@@ -26,8 +25,6 @@ public class NodeManager : Singleton<NodeManager>
         atual = inicial;
         mainCamera = Camera.main;
     }
-
-
     public void MakeNewVertex(Vector3 position)
     {
         var newNode = Instantiate(nodePrefab, position, Quaternion.identity).GetComponent<Node>();
@@ -38,19 +35,13 @@ public class NodeManager : Singleton<NodeManager>
         }
         SetAtual(newNode);
     }
-    
-
-
     private void Update()
     {
-        
         if(Input.GetMouseButtonDown(0))
         {
-
-            
             if(final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
-            if(Physics.Raycast(ray, out RaycastHit hitData, 15))
+            if(Physics.Raycast(ray, out RaycastHit hitData, 30))
             {
                 if(atual != null)
                 {
@@ -82,7 +73,7 @@ public class NodeManager : Singleton<NodeManager>
         {
             SetAtual(null);
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
-            if (Physics.Raycast(ray, out RaycastHit hitData, 15) &&
+            if (Physics.Raycast(ray, out RaycastHit hitData, 30) &&
                 hitData.collider.gameObject.GetComponent<Node>() != null)
             {
                 if (final == hitData.collider.gameObject.GetComponent<Node>())
@@ -108,12 +99,10 @@ public class NodeManager : Singleton<NodeManager>
         final = node;
         if(final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
     }
-
     void MoveNode(Node node)
     {
         node.MoveNode(mainCamera.ScreenToWorldPoint(mousePos));
     }
-
     public void ResetPath()
     {
         foreach (var node in Nodes)

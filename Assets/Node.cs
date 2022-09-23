@@ -16,14 +16,16 @@ public class Node : MonoBehaviour
     public NodeState State = NodeState.Open;
     private static Material LNMaterial;
     public Node Parent { get; set; }
-
+    public float Cost(Node neighbour)
+    {
+        return Vector3.Distance(transform.position, neighbour.transform.position);
+    }
     private void Awake()
     {
         if (LNMaterial != null) return;
         LNMaterial = new Material(Shader.Find("Sprites/Default"));
         neighbors = new List<Node>();
     }
-
     public void AddNeighbor (Node neighbor)
     {
         if (neighbors.Contains(neighbor)) return;
@@ -31,7 +33,6 @@ public class Node : MonoBehaviour
         AddVisualConnection(neighbor);
         neighbor.AddNeighbor(this);
     }
-
     private void AddVisualConnection(Node neighbor)
     {
         var neighbourPos = neighbor.transform.position;
@@ -52,7 +53,6 @@ public class Node : MonoBehaviour
             lineRenderer.SetPosition(lineRenderer.positionCount-1, neighbourPos);
         }
     }
-
     public void MoveNode(Vector3 position)
     {
         transform.position = position;
