@@ -107,8 +107,7 @@ public class NodeManager : Singleton<NodeManager>
     {
         foreach (var node in Nodes)
         {
-            node.State = NodeState.Open;
-            node.Parent = null;
+            node.Reset();
         }
         SetInicial(final);
         SetAtual(inicial);

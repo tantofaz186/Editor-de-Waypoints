@@ -4,22 +4,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public enum NodeState
-{
-    Open,
-    Closed
-}
 public class Node : MonoBehaviour
 {
     [SerializeField]List<Node> neighbors;
     public List<Node> Neighbors => neighbors;
-    public NodeState State = NodeState.Open;
     private static Material LNMaterial;
     public Node Parent { get; set; }
-    public float Cost(Node neighbour)
-    {
-        return Vector3.Distance(transform.position, neighbour.transform.position);
-    }
+    public float Cost { get; set; } = float.MaxValue;
+
     private void Awake()
     {
         if (LNMaterial != null) return;
@@ -69,10 +61,18 @@ public class Node : MonoBehaviour
                 Debug.Log("index: " + index);
                 if (index >= 0)
                 {
-                    try{neighbor.GetComponent<LineRenderer>().SetPosition(index*2 + 1, transform.position);}
-                    catch{}
+                    neighbor.GetComponent<LineRenderer>().SetPosition(index*2 + 1, transform.position);
                 }
             }
         }
+    }
+    public static float GetDistance(Node a, Node b)
+    {
+        return Vector3.Distance(a.transform.position, b.transform.position);
+    }
+    public void Reset()
+    {
+        Parent = null;
+        Cost = float.MaxValue;
     }
 }
