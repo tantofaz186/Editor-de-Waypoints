@@ -15,6 +15,7 @@ public class NodeManager : Singleton<NodeManager>
     public List<Node> Nodes;
     [SerializeField] private GameObject nodePrefab;
     private Camera mainCamera;
+    [SerializeField] private Agente agente;
     Vector3 mousePos => new Vector3(Input.mousePosition.x, Input.mousePosition.y, 11 );
 
     private void Start()
@@ -38,18 +39,7 @@ public class NodeManager : Singleton<NodeManager>
         SetAtual(newNode);
     }
     
-    public void SetAtual(Node node)
-    {
-        if (atual != null)
-        {
-            atual.GetComponent<MeshRenderer>().material.color = Color.white;
-        }
-        atual = node;
-        if (atual != null)
-        {
-            atual.GetComponent<MeshRenderer>().material.color = Color.red;
-        }
-    }
+
 
     private void Update()
     {
@@ -92,22 +82,52 @@ public class NodeManager : Singleton<NodeManager>
         {
             SetAtual(null);
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
-            if (Physics.Raycast(ray, out RaycastHit hitData, 15) && hitData.collider.gameObject.GetComponent<Node>() != null)
+            if (Physics.Raycast(ray, out RaycastHit hitData, 15) &&
+                hitData.collider.gameObject.GetComponent<Node>() != null)
+            {
+                if (final == hitData.collider.gameObject.GetComponent<Node>())
+                {
+                    agente.GetPath();
+                }
                 SetFinal(hitData.collider.gameObject.GetComponent<Node>());
-
+            }
+            
         }
         inicial.GetComponent<MeshRenderer>().material.color = Color.cyan;
     }
-
+    private void SetAtual(Node node)
+    {
+        if (atual != null) atual.GetComponent<MeshRenderer>().material.color = Color.white;
+        atual = node;
+        if (atual != null) atual.GetComponent<MeshRenderer>().material.color = Color.red;
+        
+    }
     private void SetFinal(Node node)
     {
         if(final != null) final.GetComponent<MeshRenderer>().material.color = Color.white;
         final = node;
-        final.GetComponent<MeshRenderer>().material.color = Color.green;
+        if(final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
     }
 
     void MoveNode(Node node)
     {
         node.MoveNode(mainCamera.ScreenToWorldPoint(mousePos));
+    }
+
+    public void ResetPath()
+    {
+        foreach (var node in Nodes)
+        {
+            node.State = NodeState.Open;
+            node.Parent = null;
+        }
+        SetInicial(final);
+        SetAtual(inicial);
+        SetFinal(null);
+    }
+    void SetInicial(Node node)
+    {
+        if(inicial != null) inicial.GetComponent<MeshRenderer>().material.color = Color.white;
+        inicial = node;
     }
 }

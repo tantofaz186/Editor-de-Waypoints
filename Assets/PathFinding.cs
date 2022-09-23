@@ -8,7 +8,6 @@ public class PathFinding : Singleton<PathFinding>
     private List<Node> path = new List<Node>();
     private Vector3 startPos;
     private Vector3 finalPos;
-    
     public List<Node> FindPath()
     {
         startPos = NodeManager.Instance.Inicial.transform.position;
@@ -71,4 +70,5 @@ public class PathFinding : Singleton<PathFinding>
         Vector3 nodePosition = node.transform.position;
         return Vector3.Distance(startPos, nodePosition) + Vector3.Distance(nodePosition, finalPos);
     }
+    
 }
