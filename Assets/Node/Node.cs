@@ -10,7 +10,12 @@ public class Node : MonoBehaviour
     public List<Node> Neighbors => neighbors;
     private static Material LNMaterial;
     public Node Parent { get; set; }
-    public float Cost { get; set; } = float.MaxValue;
+    [SerializeField] private float cost = float.MaxValue;
+    public float Cost
+    {
+        get => cost;
+        set => cost = value;
+    }
 
     private void Awake()
     {
