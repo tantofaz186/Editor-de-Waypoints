@@ -41,8 +41,11 @@ public class Agente : MonoBehaviour
     }
     public void GetPath()
     {
-        path = PathFinding.Instance.FindPath();
-        state = AgentState.Moving;
+        if (state != AgentState.Moving)
+        {
+            path = PathFinding.Instance.FindPath();
+            state = AgentState.Moving;
+        }
     }
     private void Move()
     {
