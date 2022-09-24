@@ -12,6 +12,7 @@ public enum AgentState
 
 public class Agente : MonoBehaviour
 {
+    [SerializeField] private float speed = 0.5f;
     List<Node> path = new List<Node>();
     AgentState state = AgentState.Start;
     private void FixedUpdate()
@@ -51,7 +52,7 @@ public class Agente : MonoBehaviour
     {
         if (path.Count > 0)
         {
-            transform.position = Vector3.MoveTowards(transform.position, path[0].transform.position, 0.1f);
+            transform.position = Vector3.MoveTowards(transform.position, path[0].transform.position, speed);
             if (Vector3.Distance(transform.position, path[0].transform.position) < 0.1f)
             {
                 path.RemoveAt(0);
