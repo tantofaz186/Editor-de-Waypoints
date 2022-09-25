@@ -16,7 +16,6 @@ public class Node : MonoBehaviour
         get => cost;
         set => cost = value;
     }
-
     private void Awake()
     {
         if (LNMaterial != null) return;
@@ -79,5 +78,26 @@ public class Node : MonoBehaviour
     {
         Parent = null;
         Cost = float.MaxValue;
+    }
+    public void Delete()
+    {
+        foreach (var neighbor in neighbors)
+        {
+            neighbor.RemoveConnection(this);
+        }
+        Destroy(gameObject);
+    }
+    private void RemoveConnection(Node node)
+    {
+        if (!TryGetComponent(out LineRenderer lineRenderer)) return;
+        int index = neighbors.FindIndex(n => n == node);
+        if (index < 0) return;
+        neighbors.Remove(node);
+        lineRenderer.positionCount = neighbors.Count * 2;
+        for (int i = 0; i < neighbors.Count; i++)
+        {
+            lineRenderer.SetPosition(i * 2, transform.position);
+            lineRenderer.SetPosition(i * 2 + 1, neighbors[i].transform.position);
+        }
     }
 }

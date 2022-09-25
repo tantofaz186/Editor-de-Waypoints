@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NiceIO.Sysroot;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,7 +12,6 @@ public class NodeManager : Singleton<NodeManager>
     private Node final;
     public Node Final => final;
     private Node atual;
-    private Node Selected;
     public List<Node> Nodes;
     [SerializeField] private GameObject nodePrefab;
     private Camera mainCamera;
@@ -44,18 +44,29 @@ public class NodeManager : Singleton<NodeManager>
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("MouseButton Pressed");
             if (final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
+
+            //se clicar em um node, ele vira o atual e vira vizinho do anterior
+            //se clicar fora de um node, cria um novo node que vira o atual e vira vizinho do anterior
+            //se clicar no mesmo node, o node é desmarcado
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
             if (Physics.Raycast(ray, out RaycastHit hitData, 200) &&
                 hitData.collider.gameObject.GetComponent<Node>() != null)
             {
                 var node = hitData.collider.gameObject.GetComponent<Node>();
-                if (atual != null && node != atual)
+                if (node == atual)
+                {
+                    SetAtual(null);
+                }
+                else if (atual != null)
                 {
                     atual.AddNeighbor(node);
+                    SetAtual(node);
                 }
-                SetAtual(node);
+                else
+                {
+                    SetAtual(node);
+                }
             }
             else
             {
@@ -69,21 +80,29 @@ public class NodeManager : Singleton<NodeManager>
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            SetAtual(null);
-            Ray ray = mainCamera.ScreenPointToRay(mousePos);
-            if (Physics.Raycast(ray, out RaycastHit hitData, 200) &&
-                hitData.collider.gameObject.GetComponent<Node>() != null)
-            {
-                if (final == hitData.collider.gameObject.GetComponent<Node>())
-                {
-                    agente.GetPath();
-                }
+            SetFinal();
+        }
 
-                SetFinal(hitData.collider.gameObject.GetComponent<Node>());
-            }
+        if (Input.GetKeyDown(KeyCode.Space) && final != null)
+        {
+            agente.GetPath();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            DeleteNode(atual);
         }
 
         inicial.GetComponent<MeshRenderer>().material.color = Color.cyan;
+    }
+
+    private void DeleteNode(Node node)
+    {
+        if (node != null)
+        {
+            Nodes.Remove(node);
+            node.Delete();
+        }
     }
 
     private void SetAtual(Node node)
@@ -95,14 +114,28 @@ public class NodeManager : Singleton<NodeManager>
 
     private void SetFinal(Node node)
     {
+        SetAtual(null);
         if (final != null) final.GetComponent<MeshRenderer>().material.color = Color.white;
         final = node;
         if (final != null) final.GetComponent<MeshRenderer>().material.color = Color.green;
     }
 
+    private void SetFinal()
+    {
+        SetAtual(null);
+        Ray ray = mainCamera.ScreenPointToRay(mousePos);
+        if (Physics.Raycast(ray, out RaycastHit hitData, 200) &&
+            hitData.collider.gameObject.GetComponent<Node>() != null)
+        {
+            if (final != null) final.GetComponent<MeshRenderer>().material.color = Color.white;
+            final = hitData.collider.gameObject.GetComponent<Node>();
+            final.GetComponent<MeshRenderer>().material.color = Color.green;
+        }
+    }
+
     void MoveNode(Node node)
     {
-        node.MoveNode(mainCamera.ScreenToWorldPoint(mousePos));
+        if (node != null) node.MoveNode(mainCamera.ScreenToWorldPoint(mousePos));
     }
 
     public void ResetPath()
